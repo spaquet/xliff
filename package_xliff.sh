@@ -5,20 +5,26 @@
 # Usage: ./package_xliff.sh [xliff_directory] [output_directory]
 #   - xliff_directory: Directory containing .xliff files (default: xliff_files)
 #   - output_directory: Directory where .xcloc packages will be created (default: xcloc_packages)
-# Version: 1.0.0
+# Version: 1.1.0
 
-VERSION="1.0.0"
+VERSION="1.1.0"
+
+# Color codes
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
 
 # Display help message
 show_help() {
-    echo "Usage: $0 [xliff_directory] [output_directory]"
+    echo -e "${GREEN}Usage:${NC} $0 [xliff_directory] [output_directory]"
     echo "Package .xliff files into .xcloc packages"
     echo
-    echo "Options:"
+    echo -e "${YELLOW}Options:${NC}"
     echo "  -h, --help     Display this help message"
     echo "  -v, --version  Display script version"
     echo
-    echo "Arguments:"
+    echo -e "${YELLOW}Arguments:${NC}"
     echo "  xliff_directory   Directory containing .xliff files (default: xliff_files)"
     echo "  output_directory  Directory for created .xcloc packages (default: xcloc_packages)"
 }
@@ -30,7 +36,7 @@ case "$1" in
         exit 0
         ;;
     -v|--version)
-        echo "package_xliff.sh version $VERSION"
+        echo -e "${GREEN}package_xliff.sh version ${VERSION}${NC}"
         exit 0
         ;;
 esac
@@ -44,7 +50,7 @@ mkdir -p "$OUTPUT_DIR"
 
 # Check if input directory exists
 if [ ! -d "$XLIFF_DIR" ]; then
-    echo "Error: Input directory '$XLIFF_DIR' does not exist."
+    echo -e "${RED}Error:${NC} Input directory '$XLIFF_DIR' does not exist."
     exit 1
 fi
 
@@ -52,9 +58,10 @@ fi
 count=0
 
 # Process each .xliff file
+echo -e "${YELLOW}Processing .xliff files...${NC}"
 for xliff in "$XLIFF_DIR"/*.xliff; do
     if [ -f "$xliff" ]; then  # Check if it's a file
-        echo "Processing: $xliff"
+        echo -e "  ${GREEN}Processing:${NC} $xliff"
         
         # Extract the language code from the filename (e.g., 'fr' from 'fr.xliff')
         base_name=$(basename "$xliff" .xliff)
@@ -65,9 +72,9 @@ for xliff in "$XLIFF_DIR"/*.xliff; do
         
         # Copy the .xliff file into the package
         cp "$xliff" "$package_dir/Localized Contents/${base_name}.xliff"
-        echo "Packaged: ${base_name}.xcloc"
+        echo -e "    ${GREEN}Packaged:${NC} ${base_name}.xcloc"
         ((count++))
     fi
 done
 
-echo "Packaging complete. Processed $count .xliff files."
+echo -e "${GREEN}Packaging complete.${NC} Processed ${count} .xliff files."

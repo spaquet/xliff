@@ -5,20 +5,26 @@
 # Usage: ./extract_xliff.sh [input_directory] [output_directory]
 #   - input_directory: Directory containing .xcloc packages (default: current directory)
 #   - output_directory: Directory where extracted .xliff files will be saved (default: xliff_files)
-# Version: 1.0.0
+# Version: 1.1.0
 
-VERSION="1.0.0"
+VERSION="1.1.0"
+
+# Color codes
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
 
 # Display help message
 show_help() {
-    echo "Usage: $0 [input_directory] [output_directory]"
+    echo -e "${GREEN}Usage:${NC} $0 [input_directory] [output_directory]"
     echo "Extract .xliff files from .xcloc packages"
     echo
-    echo "Options:"
+    echo -e "${YELLOW}Options:${NC}"
     echo "  -h, --help     Display this help message"
     echo "  -v, --version  Display script version"
     echo
-    echo "Arguments:"
+    echo -e "${YELLOW}Arguments:${NC}"
     echo "  input_directory   Directory containing .xcloc packages (default: current directory)"
     echo "  output_directory  Directory for extracted .xliff files (default: xliff_files)"
 }
@@ -30,7 +36,7 @@ case "$1" in
         exit 0
         ;;
     -v|--version)
-        echo "extract_xliff.sh version $VERSION"
+        echo -e "${GREEN}extract_xliff.sh version ${VERSION}${NC}"
         exit 0
         ;;
 esac
@@ -44,7 +50,7 @@ mkdir -p "$OUTPUT_DIR"
 
 # Check if input directory exists
 if [ ! -d "$INPUT_DIR" ]; then
-    echo "Error: Input directory '$INPUT_DIR' does not exist."
+    echo -e "${RED}Error:${NC} Input directory '$INPUT_DIR' does not exist."
     exit 1
 fi
 
@@ -52,9 +58,10 @@ fi
 count=0
 
 # Find all .xcloc packages and process them
+echo -e "${YELLOW}Processing .xcloc packages...${NC}"
 for xcloc in "$INPUT_DIR"/*.xcloc; do
     if [ -d "$xcloc" ]; then  # Check if it's a directory (package)
-        echo "Processing: $xcloc"
+        echo -e "  ${GREEN}Processing:${NC} $xcloc"
         
         # Look for .xliff files inside the package
         xliff_file=$(find "$xcloc" -type f -name "*.xliff" | head -n 1)
@@ -65,12 +72,12 @@ for xcloc in "$INPUT_DIR"/*.xcloc; do
             
             # Copy the .xliff file to output directory with package name prefix
             cp "$xliff_file" "$OUTPUT_DIR/${base_name}.xliff"
-            echo "Extracted: ${base_name}.xliff"
+            echo -e "    ${GREEN}Extracted:${NC} ${base_name}.xliff"
             ((count++))
         else
-            echo "Warning: No .xliff file found in $xcloc"
+            echo -e "    ${YELLOW}Warning:${NC} No .xliff file found in $xcloc"
         fi
     fi
 done
 
-echo "Extraction complete. Processed $count .xcloc packages."
+echo -e "${GREEN}Extraction complete.${NC} Processed ${count} .xcloc packages."
