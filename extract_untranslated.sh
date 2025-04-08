@@ -2,7 +2,7 @@
 
 # extract_untranslated.sh
 
-VERSION="1.0.1"
+VERSION="1.0.2"
 OUTPUT_FILE="untranslated_all.txt"
 DIRECTORY="."
 SOURCE_LANGUAGE="en"
@@ -84,8 +84,8 @@ for INPUT_FILE in "$DIRECTORY"/*.xliff; do
     if [[ -f "$INPUT_FILE" ]]; then
         echo "Processing: $INPUT_FILE"
         
-        # Extract target-language from the XLIFF file
-        target_language=$(grep -oP 'target-language="\K[^"]+' "$INPUT_FILE" | head -1)
+        # Extract target-language using sed instead of grep -P
+        target_language=$(sed -n 's/.*target-language="\([^"]*\)".*/\1/p' "$INPUT_FILE" | head -1)
         if [[ -z "$target_language" ]]; then
             target_language="unknown"
         fi
@@ -100,9 +100,9 @@ for INPUT_FILE in "$DIRECTORY"/*.xliff; do
                 done
                 trans_unit_content+="$next_line"
 
-                # Extract source and target (if exists)
-                source=$(echo "$trans_unit_content" | grep -oP '<source>\K[^<]+(?=</source>)')
-                target=$(echo "$trans_unit_content" | grep -oP '<target[^>]*>\K[^<]+(?=</target>)' || echo "")
+                # Extract source and target using sed instead of grep -P
+                source=$(echo "$trans_unit_content" | sed -n 's/.*<source>\(.*\)<\/source>.*/\1/p')
+                target=$(echo "$trans_unit_content" | sed -n 's/.*<target[^>]*>\(.*\)<\/target>.*/\1/p')
 
                 # Skip if source is empty or if it's "QR Unveil" or "Simple QR"
                 if [[ -z "$source" || "$source" == "QR Unveil" || "$source" == "Simple QR" ]]; then
